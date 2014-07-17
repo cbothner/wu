@@ -30,10 +30,6 @@ package main
 
 import "fmt"
 
-type Lookup struct {
-  Location SLocation
-}
-
 type SLocation struct {
   Nearby_weather_stations Nearby_weather_stations
 }
@@ -52,7 +48,7 @@ type Station struct {
 }
 
 // printLookup prints nearby stations
-func PrintLookup(obs *Lookup) {
+func PrintLookup(obs *Conditions) {
   station := obs.Location.Nearby_weather_stations.Airport.Station
   if len(station) == 0 {
     fmt.Println("No area stations")

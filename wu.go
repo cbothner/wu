@@ -163,32 +163,32 @@ func Options() string {
 
 // BuildURL returns the URL required by the Weather Underground API
 // from the query type, station id, and API key
-func BuildURL(infoType string, stationId string) string {
+func BuildURL(infoTypes []string, stationId string) string {
 
   const URLstem = "http://api.wunderground.com/api/"
   const query = "/q/"
   const format = ".json"
-  if dohistory != "" {
-    date = dohistory
-  } else if doplanner != "" {
-    date = doplanner
-  }
 
   var URL string
 
-  if date != "" {
-    URL = URLstem + conf.Key + "/" + infoType + "_" + date + query + stationId + format
-  } else {
-    URL = URLstem + conf.Key + "/" + infoType + "_" + date + query + stationId + format
+  for i, value := range infoTypes {
+    if value == "history" {
+      infoTypes[i] += "_" + dohistory
+    } else if value == "planner" {
+      infoTypes[i] += "_" + doplanner
+    }
   }
+  URL = URLstem + conf.Key + "/" + strings.Join(infoTypes, "/") + query + stationId + format
 
-  // fmt.Println(URL) //DEBUG
+   //fmt.Println(URL) //DEBUG
 
   return URL
 }
 
 // Fetch does URL processing
 func Fetch(url string) ([]byte, error) {
+//fmt.Println("Calling API") //DEBUG
+
   res, err := http.Get(url)
   CheckError(err)
   if res.StatusCode != 200 {
@@ -212,121 +212,115 @@ func init() {
   ReadConf()
 }
 
+type Conditions struct {
+  Alerts []Alerts
+  Almanac Almanac
+  Current_observation Current
+  Forecast Forecast
+  History History
+  Location SLocation
+  Moon_phase Moon_phase
+  Sunrise Sunrise
+  Sunset Sunset
+  Tide Tide
+  Trip Trip
+}
+
 // weather prints various weather information for a specified station
-func weather(operation string, station string) {
-  url := BuildURL(operation, station)
+func weather(operations []string, station string) {
+  url := BuildURL(operations, station)
   b, err := Fetch(url)
   CheckError(err)
 
-  switch operation {
-  case "almanac":
-    var obs AlmanacConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintAlmanac(&obs, station)
-  case "astronomy":
-    var obs AstroConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintAstro(&obs, station)
-  case "alerts":
-    var obs AlertConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintAlerts(&obs, station)
-  case "conditions":
-    var obs Conditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintConditions(&obs)
-  case "forecast":
-    var obs ForecastConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintForecast(&obs, station)
-  case "forecast10day":
-    var obs ForecastConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintForecast10(&obs, station)
-  case "yesterday":
-    var obs HistoryConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintHistory(&obs, station)
-  case "history":
-    var obs HistoryConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintHistory(&obs, station)
-  case "planner":
-    var obs PlannerConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintPlanner(&obs, station)
-  case "tide":
-    var obs TideConditions
-    jsonErr := json.Unmarshal(b, &obs)
-    CheckError(jsonErr)
-    PrintTides(&obs, station)
-  case "geolookup":
-    var l Lookup
-    jsonErr := json.Unmarshal(b, &l)
-    CheckError(jsonErr)
-    PrintLookup(&l)
+  var obs Conditions
+  jsonErr := json.Unmarshal(b, &obs)
+  CheckError(jsonErr)
+  for _, operation := range operations {
+    operation = strings.Split(operation, "_")[0]
+    switch operation {
+    case "almanac":
+      PrintAlmanac(&obs, station)
+    case "astronomy":
+      PrintAstro(&obs, station)
+    case "alerts":
+      PrintAlerts(&obs, station)
+    case "conditions":
+      PrintConditions(&obs)
+    case "forecast":
+      PrintForecast(&obs, station)
+    case "forecast10day":
+      PrintForecast10(&obs, station)
+    case "yesterday":
+      PrintHistory(&obs, station)
+    case "history":
+      PrintHistory(&obs, station)
+    case "planner":
+      PrintPlanner(&obs, station)
+    case "tide":
+      PrintTides(&obs, station)
+    case "geolookup":
+      PrintLookup(&obs)
+    }
   }
 }
 
 func main() {
   stationId := Options()
+  operations := make([]string, 0)
+  if dohistory != "" && doplanner != "" {
+    fmt.Println(
+      "Weather Underground does not support making a history\n" +
+      "request and a planner request at the same time.")
+    os.Exit(1)
+  }
   if doall {
-    weather("conditions", stationId)
-    weather("forecast", stationId)
-    weather("forecast10day", stationId)
-    weather("alerts", stationId)
-    weather("almanac", stationId)
-    weather("history", stationId)
-    weather("planner", stationId)
-    weather("yesterday", stationId)
-    weather("astronomy", stationId)
-    weather("tide", stationId)
-    weather("geolookup", stationId)
-    os.Exit(0)
+    operations = append(operations,"conditions")
+    operations = append(operations,"forecast")
+    operations = append(operations,"forecast10day")
+    operations = append(operations,"alerts")
+    operations = append(operations,"almanac")
+    operations = append(operations,"history")
+    operations = append(operations,"planner")
+    operations = append(operations,"yesterday")
+    operations = append(operations,"astronomy")
+    operations = append(operations,"tide")
+    operations = append(operations,"geolookup")
   }
   if doalerts {
-    weather("alerts", stationId)
+    operations = append(operations,"alerts")
   }
   if doalmanac {
-    weather("almanac", stationId)
+    operations = append(operations,"almanac")
   }
   if doastro {
-    weather("astronomy", stationId)
+    operations = append(operations,"astronomy")
   }
   if doconditions {
-    weather("conditions", stationId)
+    operations = append(operations,"conditions")
   }
   if doforecast {
-    weather("forecast", stationId)
+    operations = append(operations,"forecast")
   }
   if doforecast10 {
-    weather("forecast10day", stationId)
+    operations = append(operations,"forecast10day")
   }
   if dohistory != "" {
-    weather("history", stationId)
+    operations = append(operations,"history")
   }
   if doyesterday {
-    weather("yesterday", stationId)
+    operations = append(operations,"yesterday")
   }
   if doplanner != "" {
-    weather("planner", stationId)
+    operations = append(operations,"planner")
   }
   if dotides {
-    weather("tide", stationId)
+    operations = append(operations,"tide")
   }
   if dolookup {
-    weather("geolookup", stationId)
+    operations = append(operations,"geolookup")
   }
   if flag.NFlag() == 0 {
-    weather("conditions", stationId)
+    operations = append(operations,"conditions")
   }
+  weather(operations, stationId)
 }

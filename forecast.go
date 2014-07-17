@@ -32,10 +32,6 @@ import (
   "fmt"
 )
 
-type ForecastConditions struct {
-  Forecast Forecast
-}
-
 type Forecast struct {
   Txt_forecast Txt_forecast
 }
@@ -51,7 +47,7 @@ type Forecastday struct {
 }
 
 // printForecast prints the forecast for a given station to standard out
-func PrintForecast(obs *ForecastConditions, stationId string) {
+func PrintForecast(obs *Conditions, stationId string) {
   t := obs.Forecast.Txt_forecast
   fmt.Printf("Forecast for %s\n", stationId)
   fmt.Printf("Issued at %s\n", t.Date)

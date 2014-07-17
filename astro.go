@@ -33,12 +33,6 @@ import (
   "strconv"
 )
 
-type AstroConditions struct {
-  Moon_phase Moon_phase
-  Sunrise    Sunrise
-  Sunset     Sunset
-}
-
 type Moon_phase struct {
   PercentIlluminated string
   AgeOfMoon          string
@@ -57,7 +51,7 @@ type Sunset struct {
 }
 
 // printAstro prints the lunar and solar informtion for a given station to standard out
-func PrintAstro(obs *AstroConditions, stationId string) {
+func PrintAstro(obs *Conditions, stationId string) {
 
   var age, _ = strconv.Atoi(obs.Moon_phase.AgeOfMoon)
   var moonDesc string

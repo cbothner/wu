@@ -32,10 +32,6 @@ import (
   "fmt"
 )
 
-type AlmanacConditions struct {
-  Almanac Almanac
-}
-
 type Almanac struct {
   Temp_high Temp_high
   Temp_low  Temp_low
@@ -64,7 +60,7 @@ type Record struct {
 }
 
 // printAlmanac prints the Almanac for a given station to standard out
-func PrintAlmanac(obs *AlmanacConditions, stationId string) {
+func PrintAlmanac(obs *Conditions, stationId string) {
 
   normalHighF := obs.Almanac.Temp_high.Normal.F
   normalHighC := obs.Almanac.Temp_high.Normal.C

@@ -35,11 +35,6 @@ import (
 	"strings"
 )
 
-
-type Conditions struct {
-  Current_observation Current
-}
-
 type Current struct {
   Observation_time     string
   Observation_location Location

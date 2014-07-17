@@ -35,10 +35,6 @@ import (
   "time"
 )
 
-type TideConditions struct {
-  Tide Tide
-}
-
 type Tide struct {
   Tideinfo    []Tideinfo
   Tidesummary []Tidesummary
@@ -59,7 +55,7 @@ type Data struct {
 }
 
 // printTides prints the tidal data for given station to standard out
-func PrintTides(obs *TideConditions, stationID string) {
+func PrintTides(obs *Conditions, stationID string) {
   tide := obs.Tide
   info := tide.Tideinfo
   summary := tide.Tidesummary

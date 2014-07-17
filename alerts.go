@@ -32,10 +32,6 @@ import (
   "fmt"
 )
 
-type AlertConditions struct {
-  Alerts []Alerts
-}
-
 type Alerts struct {
   Date        string
   Expires     string
@@ -44,7 +40,7 @@ type Alerts struct {
 }
 
 // printAlerts prints the alerts for a given station to standard out
-func PrintAlerts(obs *AlertConditions, stationId string) {
+func PrintAlerts(obs *Conditions, stationId string) {
   if len(obs.Alerts) == 0 {
     fmt.Println("No active alerts")
   } else {

@@ -34,7 +34,7 @@ import (
 
 // printForecast prints the forecast for a given station to standard out
 // The dat structure on which it depends is in forecast.go.
-func PrintForecast10(obs *ForecastConditions, stationId string) {
+func PrintForecast10(obs *Conditions, stationId string) {
   t := obs.Forecast.Txt_forecast
   fmt.Printf("Forecast for %s\n", stationId)
   fmt.Printf("Issued at %s\n", t.Date)

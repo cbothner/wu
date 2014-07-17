@@ -33,10 +33,6 @@ import (
   "os"
 )
 
-type PlannerConditions struct {
-  Trip Trip
-}
-
 type Trip struct {
   Title        string
   Airport_code string
@@ -173,7 +169,7 @@ type Chanceofsnowday struct {
   Percentage  string
 }
 
-func PrintPlanner(obs *PlannerConditions, stationId string) {
+func PrintPlanner(obs *Conditions, stationId string) {
 
   if obs.Trip.Error != "" {
     fmt.Println(obs.Trip.Error)

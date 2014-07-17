@@ -35,10 +35,6 @@ import (
   "strconv"
 )
 
-type HistoryConditions struct {
-  History History
-}
-
 type History struct {
   Date         Date // Defined in wu.go
   Observations []Observations
@@ -119,7 +115,7 @@ type Dailysummary struct {
   Since1jancoolingdegreedaysnormal   string
 }
 
-func PrintHistory(obs *HistoryConditions, stationId string) {
+func PrintHistory(obs *Conditions, stationId string) {
 
   if len(obs.History.Observations) == 0 {
     fmt.Println("No data available for specified date")
